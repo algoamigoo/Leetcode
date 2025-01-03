@@ -3,7 +3,7 @@ public:
     bool bs(vector<int>& piles, int k, int h) {
         int hrs = 0;
         for (int pile : piles) {
-            hrs += (pile + k - 1) / k;
+            hrs += ceil((pile*1.0)/k);
             if (hrs > h) 
             return false;
         }
