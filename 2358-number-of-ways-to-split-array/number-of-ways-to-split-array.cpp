@@ -9,10 +9,8 @@ public:
         for(int i=0;i<nums.size()-1;i++){
         curr+=nums[i];
         if(curr>=sum/2)
-        {//cout<<curr<<" "<<i;
-        c++;
-        //cout<<endl;}
-        }}
+        c++;}
+        
         return c;
     }
 };
