@@ -1,52 +1,49 @@
 class Solution {
 public:
-    // Step 1: Build the adjacency list graph and compute Bob's distances
-    void buildGraphAndBobDist(vector<vector<int>>& edges, int n, int bob, vector<vector<int>>& adj, vector<int>& bobDist) {
-        // Build undirected graph
-        for (auto& edge : edges) {
-            int u = edge[0], v = edge[1];
-            adj[u].push_back(v);
-            adj[v].push_back(u);
-        }
-
-        // Use BFS to find parent array for Bob's path to root (node 0)
-        vector<int> parent(n, -1);
+    // Step 1: Compute Bob's distances to node 0 using BFS, tracing path from bob to root
+    void computeBobDistBFS(int bob, vector<vector<int>>& adj, vector<int>& bobDist) {
+        int n = adj.size();
         queue<int> q;
-        q.push(0);
+        vector<int> parent(n, -1);
+
+        q.push(bob);
+        bobDist[bob] = 0;
         
         while (!q.empty()) {
             int node = q.front();
             q.pop();
+            if (node == 0) break;
             
             for (int neighbor : adj[node]) {
-                if (parent[neighbor] == -1 && neighbor != 0) { // Skip if already visited
+                if (bobDist[neighbor] == -1) {
+                    bobDist[neighbor] = bobDist[node] + 1;
                     parent[neighbor] = node;
                     q.push(neighbor);
                 }
             }
         }
 
-        // Trace Bob's path back to node 0 and mark distances
-        int dist = 0;
-        int curr = bob;
+        // Reset bobDist to only include nodes on Bob's path to node 0
+        vector<int> tempDist(n, -1);
+        int curr = 0;
         while (curr != -1) {
-            bobDist[curr] = dist++;
+            tempDist[curr] = bobDist[curr];
             curr = parent[curr];
         }
+        bobDist = tempDist;
     }
 
     // Step 2: DFS to find Alice's maximum profit
     int dfsAlice(int node, int parent, int aliceDist, vector<vector<int>>& adj, vector<int>& amount, vector<int>& bobDist) {
-        // Calculate income at current node
         int income = 0;
         if (bobDist[node] == -1 || aliceDist < bobDist[node]) {
-            // Alice arrives before Bob or Bob never reaches here
+            // Alice arrives before Bob or Bob never reaches this node
             income = amount[node];
         } else if (aliceDist == bobDist[node]) {
-            // Alice and Bob arrive simultaneously, split the cost/reward
+            // Alice and Bob arrive simultaneously, split cost/reward
             income = amount[node] / 2;
         }
-        // If Alice arrives after Bob, income stays 0 (gate already opened by Bob)
+        // If Alice arrives after Bob, income is 0 (gate already opened)
 
         // Check if this is a leaf node
         bool isLeaf = true;
@@ -61,22 +58,26 @@ public:
             }
         }
 
-        // If leaf node, return just the income at this node
-        if (isLeaf) return income;
-        
-        // Otherwise, return income plus max profit from children
-        return income + maxChildProfit;
+        // Return total profit: income at this node + max profit from children (if any)
+        return income + (isLeaf ? 0 : maxChildProfit);
     }
 
     int mostProfitablePath(vector<vector<int>>& edges, int bob, vector<int>& amount) {
         int n = amount.size();
         
-        // Initialize adjacency list and Bob's distance array
+        // Build the undirected tree graph
         vector<vector<int>> adj(n);
-        vector<int> bobDist(n, -1); // -1 means Bob doesn't reach this node
-        
-        // Section 1: Build graph and compute Bob's distances to node 0
-        buildGraphAndBobDist(edges, n, bob, adj, bobDist);
+        for (auto& edge : edges) {
+            int u = edge[0], v = edge[1];
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+
+        // Initialize Bob's distance array
+        vector<int> bobDist(n, -1);
+
+        // Section 1: Compute Bob's distances to node 0 using BFS
+        computeBobDistBFS(bob, adj, bobDist);
 
         // Section 2: Run DFS from Alice's starting point (node 0) to maximize profit
         return dfsAlice(0, -1, 0, adj, amount, bobDist);
