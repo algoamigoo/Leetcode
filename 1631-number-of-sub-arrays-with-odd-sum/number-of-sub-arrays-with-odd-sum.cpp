@@ -1,25 +1,30 @@
 class Solution {
 public:
-    int numOfSubarrays(vector<int>& v) {
-
-        // 1 4 9
-        int n=v.size();
-        vector<int> pre(n,0);
-        pre[0]=v[0];
-        for(int i=1;i<n;i++){
-            pre[i]=pre[i-1]+v[i];
+    int numOfSubarrays(vector<int>& arr) {
+        const int MOD = 1e9 + 7;
+        long long result = 0;
+        int oddCount = 0;  // count of subarrays ending at current position with odd sum
+        int evenCount = 0; // count of subarrays ending at current position with even sum
+        int currSum = 0;   // running sum
+        
+        for(int num : arr) {
+            currSum += num;
+            
+            // If current sum is odd
+            if(currSum % 2) {
+                // Add all even-sum subarrays before this (they become odd when combined)
+                // Plus 1 for the single element subarray
+                result = (result + evenCount + 1) % MOD;
+                oddCount++;
+            } 
+            // If current sum is even
+            else {
+                // Add all odd-sum subarrays before this (they become odd when combined)
+                result = (result + oddCount) % MOD;
+                evenCount++;
+            }
         }
-        long long ans=0,o=0,e=0,mod=1e9+7;
-        for(int i=0;i<n;i++){
-            if(pre[i]%2)
-            {o++;ans=(ans+e%mod)%mod;
-            ans++;}
-            else
-            {e++;ans=(ans+o%mod)%mod;}
-        }
-
-
-        return ans;
-
+        
+        return result;
     }
 };
