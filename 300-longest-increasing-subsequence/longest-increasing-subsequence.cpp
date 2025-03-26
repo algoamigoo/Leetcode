@@ -2,23 +2,23 @@ class Solution {
 public:
     int n;
     int t[2501][2501];
-    int lis(vector<int>& nums, int prev_idx, int curr_idx) {
-       if(curr_idx == n)
+    int lis(vector<int>& nums, int p, int i) {
+       if(i == n)
            return 0;
         
-        if(prev_idx != -1 && t[prev_idx][curr_idx] != -1)
-            return t[prev_idx][curr_idx];
+        if(p != -1 && t[p][i] != -1)
+            return t[p][i];
         
-        int taken = 0;
-        if(prev_idx == -1 || nums[curr_idx] > nums[prev_idx])
-            taken = 1 + lis(nums, curr_idx, curr_idx+1);
+        int take = 0;
+        if(p == -1 || nums[i] > nums[p])
+            take = 1 + lis(nums, i, i+1);
         
-        int not_taken = lis(nums, prev_idx, curr_idx+1);
+        int not_take = lis(nums, p, i+1);
         
-        if(prev_idx != -1)
-            t[prev_idx][curr_idx] =  max(taken, not_taken);
+        if(p != -1)
+            t[p][i] =  max(take, not_take);
         
-        return max(taken, not_taken);
+        return max(take, not_take);
             
     }
     int lengthOfLIS(vector<int>& nums) {
