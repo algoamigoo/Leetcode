@@ -2,9 +2,8 @@ class Solution {
 public:
     void backtrack(vector<int>& in, vector<vector<int>>& req, 
                   int i, int curr, int& mx) {
-        // Base case: reached end of requests
+        
         if (i == req.size()) {
-            // Check if all buildings have zero net change
             for (int degree : in) {
                 if (degree != 0) 
                 return;
