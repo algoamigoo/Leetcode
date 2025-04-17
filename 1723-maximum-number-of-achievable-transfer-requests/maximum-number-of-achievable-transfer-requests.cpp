@@ -1,30 +1,32 @@
 class Solution {
 public:
-    void backtrack(vector<int>& indegrees, vector<vector<int>>& requests, 
-                  int index, int currCount, int& maxRequests) {
+    void backtrack(vector<int>& in, vector<vector<int>>& req, 
+                  int i, int curr, int& mx) {
         // Base case: reached end of requests
-        if (index == requests.size()) {
+        if (i == req.size()) {
             // Check if all buildings have zero net change
-            for (int degree : indegrees) {
-                if (degree != 0) return;
+            for (int degree : in) {
+                if (degree != 0) 
+                return;
             }
-            maxRequests = max(maxRequests, currCount);
+            mx = max(mx, curr);
             return;
         }
-        backtrack(indegrees, requests, index + 1, currCount, maxRequests);
+        backtrack(in, req, i + 1, curr, mx);
         
-        indegrees[requests[index][0]]--;
-        indegrees[requests[index][1]]++; 
-        backtrack(indegrees, requests, index + 1, currCount + 1, maxRequests);
+        in[req[i][0]]--;
+        in[req[i][1]]++; 
         
-        indegrees[requests[index][0]]++;
-        indegrees[requests[index][1]]--;
+        backtrack(in, req, i + 1, curr+1, mx);
+        
+        in[req[i][0]]++;
+        in[req[i][1]]--; 
     }
     
-    int maximumRequests(int n, vector<vector<int>>& requests) {
-        vector<int> indegrees(n, 0);
-        int maxRequests = 0;
-        backtrack(indegrees, requests, 0, 0, maxRequests);
-        return maxRequests;
+    int maximumRequests(int n, vector<vector<int>>& req) {
+        vector<int> in(n, 0);
+        int mx = 0;
+        backtrack(in, req, 0, 0, mx);
+        return mx;
     }
 };
