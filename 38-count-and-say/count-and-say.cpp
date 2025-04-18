@@ -14,10 +14,7 @@ public:
                 c = 1;
             }
         }
-        // Handle the last group
-        if (!s.empty()) {
-            temp += to_string(c) + s[s.length()-1];
-        }
+        temp += to_string(c) + s[s.length()-1];
         
         s = temp; // Update s with the new term
         rec(i+1, n, s); // Recurse for next term
