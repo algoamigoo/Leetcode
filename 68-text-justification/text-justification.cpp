@@ -1,48 +1,57 @@
 class Solution {
 public:
     vector<string> fullJustify(vector<string>& words, int maxWidth) {
-        vector<string> res;
-        int i = 0, n = words.size();
-        
-        while (i < n) {
-            int lineLen = words[i].size();
-            int j = i + 1;
-            
-            // Try to fit as many words in this line as possible
-            while (j < n && lineLen + 1 + words[j].size() <= maxWidth) {
-                lineLen += 1 + words[j].size();
-                j++;
+        vector<vector<string>> lines;         // Each vector<string> is one line of words
+        vector<string> currLine;              // Temporary container for the current line
+        int currLen = 0;                      // Total characters (excluding spaces) in current line
+
+        // Step 1: Brute-force pack words greedily
+        for (string &word : words) {
+            // If adding the next word would exceed maxWidth
+            if (currLen + currLine.size() + word.size() > maxWidth) {
+                lines.push_back(currLine);    // Store the current line
+                currLine.clear();
+                currLen = 0;
             }
-            
-            int gaps = j - i - 1;
-            string line = "";
-            
-            // Last line or only one word
-            if (j == n || gaps == 0) {
-                for (int k = i; k < j; ++k) {
-                    line += words[k];
-                    if (k < j - 1) line += " ";
-                }
-                line += string(maxWidth - line.size(), ' ');
+            currLine.push_back(word);
+            currLen += word.size();           // Update total character length
+        }
+        if (!currLine.empty()) lines.push_back(currLine); // Add the last line
+
+        // Step 2: Justify each line
+        vector<string> result;
+
+        for (int idx = 0; idx < lines.size(); ++idx) {
+            vector<string>& line = lines[idx];
+            int totalChars = 0;
+            for (string &w : line) totalChars += w.size(); // Count non-space characters
+
+            int spaces = maxWidth - totalChars;
+            int gaps = line.size() - 1;
+            string s;
+
+            // If it's the last line or only one word, left-justify
+            if (idx == lines.size() - 1 || gaps == 0) {
+                s = line[0];
+                for (int i = 1; i < line.size(); ++i)
+                    s += " " + line[i];
+                s += string(maxWidth - s.size(), ' '); // Pad trailing spaces
             } else {
-                int totalChars = 0;
-                for (int k = i; k < j; ++k) totalChars += words[k].size();
-                int spaces = maxWidth - totalChars;
-                int spaceBetween = spaces / gaps;
+                // Distribute spaces evenly for full justification
+                int spacePerGap = spaces / gaps;
                 int extra = spaces % gaps;
-                
-                for (int k = i; k < j; ++k) {
-                    line += words[k];
-                    if (k < j - 1) {
-                        line += string(spaceBetween + (k - i < extra ? 1 : 0), ' ');
+
+                for (int i = 0; i < line.size(); ++i) {
+                    s += line[i];
+                    if (i < gaps) {
+                        s += string(spacePerGap + (i < extra ? 1 : 0), ' ');
                     }
                 }
             }
-            
-            res.push_back(line);
-            i = j;
+
+            result.push_back(s);
         }
-        
-        return res;
+
+        return result;
     }
 };
