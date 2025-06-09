@@ -1,31 +1,32 @@
 class Solution {
 public:
-    int n;
     string s;
-    unordered_map<string, bool> memo;
+    int n;
+    int dp[105][105]; // -1 = not visited, 0 = false, 1 = true
 
-    bool solve(int i, int open) {
-        if (open < 0) return false;
+    bool func(int i, int open) {
+        if (open < 0) return false; // too many closing brackets
         if (i == n) return open == 0;
+        if (dp[i][open] != -1) return dp[i][open];
 
-        string key = to_string(i) + "," + to_string(open);
-        if (memo.count(key)) return memo[key];
-
-        if (s[i] == '(')
-            return memo[key] = solve(i+1, open+1);
-        else if (s[i] == ')')
-            return memo[key] = solve(i+1, open-1);
-        else {
-            return memo[key] =
-                solve(i+1, open) ||         // treat '*' as empty
-                solve(i+1, open+1) ||       // treat '*' as '('
-                solve(i+1, open-1);         // treat '*' as ')'
+        bool ans = false;
+        if (s[i] == '(') {
+            ans = func(i + 1, open + 1);
+        } else if (s[i] == ')') {
+            ans = func(i + 1, open - 1);
+        } else { // s[i] == '*'
+            ans = func(i + 1, open)         // '*' as empty
+                || func(i + 1, open + 1)    // '*' as '('
+                || func(i + 1, open - 1);   // '*' as ')'
         }
+
+        return dp[i][open] = ans;
     }
 
     bool checkValidString(string str) {
         s = str;
         n = s.length();
-        return solve(0, 0);
+        memset(dp, -1, sizeof(dp));
+        return func(0, 0);
     }
 };
