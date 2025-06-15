@@ -1,53 +1,40 @@
 class Solution {
-public:
-    int maxDiff(int num) {
-        string s = to_string(num);
-        string a = s;
-        string b = s;
-        int len = s.length();
-        // for maximising a
+public:int maxDiff(int num) {
+    string s = to_string(num);
+    string a = s, b = s;
+    int len = s.length();
 
-        // step 1 extracting first non 9 digit from string
-        char p = '9';
+    // Maximize a: Replace first non-9 digit with 9
+    char digit_to_max = '9';
+    for (int i = 0; i < len; i++) {
+        if (s[i] != '9') {
+            digit_to_max = s[i];
+            break;
+        }
+    }
+    for (int i = 0; i < len; i++) {
+        if (a[i] == digit_to_max) a[i] = '9';
+    }
+
+    // Minimize b: Replace first digit with 1, or first non-1, non-0 digit with 0
+    if (b[0] != '1') {
+        char first_digit = b[0];
         for (int i = 0; i < len; i++) {
-            if (s[i] != '9') {
-                p = s[i];
+            if (b[i] == first_digit) b[i] = '1';
+        }
+    } else {
+        char digit_to_min = '0';
+        for (int i = 1; i < len; i++) {
+            if (b[i] != '1' && b[i] != '0') {
+                digit_to_min = b[i];
                 break;
             }
         }
-        // step 2 replacing all the p with 9
-
         for (int i = 0; i < len; i++) {
-            if (a[i] == p)
-                a[i] = '9';
+            if (b[i] == digit_to_min) b[i] = '0';
         }
-
-        // for minimising b
-        if (b[0] != '1') { // case when b isnt 1
-            char c = b[0];
-            for (int i = 0; i < len; i++) {
-                if (b[i] == c)
-                    b[i] = '1';
-            }
-        } else { // case to ensure it remains non zero and minimsed
-            char c = '1';
-            for (int i = 0; i < len; i++) {
-                if (b[i] != '1' && b[i]!='0') {
-                    c = b[i];
-                    break;
-                }
-            }
-
-            for (int i = 0; i < len; i++) {
-                if (b[i] == c && c == '1')
-                    b[i] = '1';
-                else if (b[i] == c && c != '1')
-                    b[i] = '0';
-            }
-        }
-        int x = stoi(a);
-        int y = stoi(b);
-
-        return x - y;
     }
+
+    return stoi(a) - stoi(b);
+}
 };
