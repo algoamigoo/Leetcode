@@ -1,31 +1,23 @@
 class Solution {
 public:
     int n;
-    int dp[301][11][301]; // i, curr_d, j
+    int dp[301][11];
+    int func(int i, int d, vector<int>& v) {
+        if (d == 0 && i == n) return 0;
+        if (d == 0 || i == n) return INT_MAX;
+        if (dp[i][d] != -1) return dp[i][d];
 
-    int func(int i, vector<int>& v, int d, int curr_d, int j) {
-        if (i == n) {
-            if (curr_d > d) return 0;
-            return INT_MAX;
-        }
-
-        if (curr_d > d) return INT_MAX;
-
-        if (dp[i][curr_d][j] != -1) return dp[i][curr_d][j];
-
-        // Option 1: Don't take partition ending here
-        int nottake = func(i + 1, v, d, curr_d, j);
-
-        // Option 2: Take partition ending here
         int mx = 0;
-        for (int ind = j; ind <= i; ind++) {
-            mx = max(mx, v[ind]);
+        int res = INT_MAX;
+
+        for (int j = i; j < n; ++j) {
+            mx = max(mx, v[j]);
+            int next = func(j + 1, d - 1, v);
+            if (next != INT_MAX)
+                res = min(res, mx + next);
         }
 
-        int take = func(i + 1, v, d, curr_d + 1, i + 1);
-        if (take != INT_MAX) take += mx;
-
-        return dp[i][curr_d][j] = min(nottake, take);
+        return dp[i][d] = res;
     }
 
     int minDifficulty(vector<int>& v, int d) {
@@ -33,7 +25,7 @@ public:
         if (d > n) return -1;
 
         memset(dp, -1, sizeof(dp));
-        int ans = func(0, v, d, 1, 0);
-        return (ans == INT_MAX) ? -1 : ans;
+        int ans = func(0, d, v);
+        return ans == INT_MAX ? -1 : ans;
     }
 };
