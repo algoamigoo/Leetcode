@@ -1,52 +1,61 @@
-// tweetid,userid  ------> pair<int,pair<tweetid,userid>>
 class Twitter {
 public:
-    
-    vector<pair<int,int>> q; // userID,tweetID
-    unordered_map<int, set<int>> following; // changed from vector to unordered_map
-    
-    Twitter() {
-    }
-    
+    // who follows whom
+    unordered_map<int, unordered_set<int>> following;
+
+    // userId → list of {timestamp, tweetId}
+    unordered_map<int, vector<pair<int, int>>> tweets;
+
+    int time = 0; // global timestamp counter
+
+    Twitter() {}
+
     void postTweet(int userId, int tweetId) {
-        q.push_back({userId, tweetId});
-        // Optional: Limit q size to 1000 to prevent unbounded growth
-        if (q.size() > 1000) {
-            q.erase(q.begin());
-        }
+        tweets[userId].push_back({time++, tweetId});
     }
 
     vector<int> getNewsFeed(int userId) {
-        vector<int> ans;
-        int count = 0;
-        // Iterate from most recent tweet backwards
-        for (int i = q.size() - 1; i >= 0 && count < 10; i--) {
-            int user = q[i].first;
-            int tweetId = q[i].second;
-            // Optimization: Early exit if user has no followees and tweet isn't theirs
-            if (user != userId && following[userId].empty()) continue;
-            if (user == userId || following[userId].find(user) != following[userId].end()) {
-                ans.push_back(tweetId);
-                count++;
+        // Use a max-heap to get most recent tweets
+        priority_queue<pair<int, pair<int, int>>> pq;
+
+        // Make sure user follows themselves
+        following[userId].insert(userId);
+
+        // For all users this user follows, push their most recent tweet (if any)
+        for (int followeeId : following[userId]) {
+            auto& tw = tweets[followeeId];
+            if (!tw.empty()) {
+                int idx = tw.size() - 1; // index of most recent tweet
+                pq.push({tw[idx].first, {followeeId, idx}});
             }
         }
+
+        vector<int> ans;
+
+        // Fetch top 10 tweets from the heap
+        while (!pq.empty() && ans.size() < 10) {
+            auto [curTime, p] = pq.top(); pq.pop();
+            int uid = p.first;
+            int idx = p.second;
+
+            ans.push_back(tweets[uid][idx].second); // tweetId
+
+            // Push the previous tweet from same user, if it exists
+            if (idx > 0) {
+                pq.push({tweets[uid][idx - 1].first, {uid, idx - 1}});
+            }
+        }
+
         return ans;
     }
-    
+
     void follow(int followerId, int followeeId) {
-        following[followerId].insert(followeeId);  // who he is following
+        if (followerId != followeeId)
+            following[followerId].insert(followeeId);
     }
-    
+
     void unfollow(int followerId, int followeeId) {
-        following[followerId].erase(followeeId); // who he is following
+        if (followerId != followeeId)
+            following[followerId].erase(followeeId);
     }
 };
-
-/**
- * Your Twitter object will be instantiated and called as such:
- * Twitter* obj = new Twitter();
- * obj->postTweet(userId,tweetId);
- * vector<int> param_2 = obj->getNewsFeed(userId);
- * obj->follow(followerId,followeeId);
- * obj->unfollow(followerId,followeeId);
- */
