@@ -1,7 +1,7 @@
 class KthLargest {
 public:
 
-    priority_queue<int,vector<int>,greater<int>> pq; // max heap, stores smallest at top
+    priority_queue<int,vector<int>,greater<int>> pq; // min heap, stores smallest at top
     int queue_size=0;
     KthLargest(int k, vector<int>& nums) {
         queue_size=k;
