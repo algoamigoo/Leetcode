@@ -1,31 +1,32 @@
 class Solution {
 public:
     long long maxScore(vector<int>& nums1, vector<int>& nums2, int k) {
-        int n = nums1.size();
-        vector<pair<int, int>> v;
-        
-        for (int i = 0; i < n; i++) {
-            v.push_back({nums2[i], nums1[i]});
+        long long ans=0;
+        vector<pair<int,int>> p;
+        for(int i=0;i<nums1.size();i++){
+            p.push_back({nums2[i],nums1[i]});
         }
-        sort(v.rbegin(), v.rend());
-        priority_queue<int, vector<int>, greater<int>> pq;
+        sort(p.begin(),p.end(),greater());
+        int i=0,n=nums1.size();
 
-        long long sum = 0, ans = 0;
-        
-        for (int i = 0; i < k; i++) {
-            pq.push(v[i].second);
-            sum += v[i].second;
-        }
-        ans = sum * v[k - 1].first;
-
-        for (int i = k; i < n; i++) {
-            pq.push(v[i].second);
-            sum += v[i].second;
-            sum -= pq.top();
-            pq.pop();
-            ans = max(ans, sum * v[i].first);
+        priority_queue<int,vector<int>,greater<int>> q;
+        long long sum=0;
+        for(int i=0;i<k;i++){
+            sum+=p[i].second;
+            q.push(p[i].second);
         }
 
+        ans=sum*p[k-1].first;
+        cout<<ans;
+        for(int i=k;i<n;i++){
+            int x = q.top();
+            sum-=x;
+            q.pop();
+            q.push(p[i].second);
+            sum+=p[i].second;
+
+            ans=max(ans,sum*p[i].first);
+        }
         return ans;
     }
 };
