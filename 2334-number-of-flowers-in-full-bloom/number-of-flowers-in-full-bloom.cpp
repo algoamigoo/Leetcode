@@ -1,23 +1,33 @@
 class Solution {
 public:
     vector<int> fullBloomFlowers(vector<vector<int>>& flowers, vector<int>& people) {
-        vector<int> ans;
-        vector<int> starts, ends;
-        
+        vector<pair<int, int>> events, pre;
+        int n = flowers.size();
+
+        // Create start and end+1 events
         for (auto& f : flowers) {
-            starts.push_back(f[0]);
-            ends.push_back(f[1]);
+            events.push_back({f[0], 1});      // flower starts
+            events.push_back({f[1] + 1, -1}); // flower ends after f[1]
         }
-        
-        sort(starts.begin(), starts.end());
-        sort(ends.begin(), ends.end());
-        
+
+        // Sort events by time
+        sort(events.begin(), events.end());
+
+        // Build prefix sums of active flowers
+        int bloom = 0;
+        for (auto& e : events) {
+            bloom += e.second;
+            pre.push_back({e.first, bloom});
+        }
+
+        // Answer each query using upper_bound
+        vector<int> ans;
         for (int t : people) {
-            int bloomed = upper_bound(starts.begin(), starts.end(), t) - starts.begin();
-            int died = lower_bound(ends.begin(), ends.end(), t) - ends.begin();
-            ans.push_back(bloomed - died);
+            auto it = upper_bound(pre.begin(), pre.end(), make_pair(t, INT_MAX));
+            if (it == pre.begin()) ans.push_back(0);
+            else ans.push_back((--it)->second);
         }
-        
+
         return ans;
     }
 };
