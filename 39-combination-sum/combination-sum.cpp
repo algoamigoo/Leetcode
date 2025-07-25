@@ -1,26 +1,28 @@
 class Solution {
 public:
-    int n;
-    set<vector<int>> ans;
-    void backtrack(int i,vector<int>& candidates,vector<int> temp,int sum,int target){
-        if(sum==target)
-        ans.insert(temp);
-        if(i==n || sum>target)
-        return;
-        
-        //backtrack
-        backtrack(i+1,candidates,temp,sum,target);
-        temp.push_back(candidates[i]);
-        backtrack(i,candidates,temp,sum+candidates[i],target);
-    }
-    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
-        n = candidates.size();
-        vector<int> temp;
-        backtrack(0,candidates,temp,0,target);
-        vector<vector<int>> final;
-        for(auto it : ans){
-            final.push_back(it);
+    vector<vector<int>> result;
+
+    void backtrack(int i, vector<int>& candidates, vector<int>& temp, int sum, int target) {
+        if (sum == target) {
+            result.push_back(temp);
+            return;
         }
-        return final;
+        if (i == candidates.size() || sum > target)
+            return;
+
+        // Include current element
+        temp.push_back(candidates[i]);
+        backtrack(i, candidates, temp, sum + candidates[i], target);
+        temp.pop_back();  // backtrack
+
+        // Exclude current element and move to next
+        backtrack(i + 1, candidates, temp, sum, target);
+    }
+
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<int> temp;
+        result.clear();
+        backtrack(0, candidates, temp, 0, target);
+        return result;
     }
 };
