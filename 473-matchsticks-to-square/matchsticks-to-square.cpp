@@ -1,30 +1,35 @@
 class Solution {
 public:
-    bool backtrack(vector<int>& matchsticks, vector<int>& sides, int index, int target) {
-        if (index == matchsticks.size()) {
-            return sides[0] == target && sides[1] == target 
-            && sides[2] == target && sides[3] == target;
+    bool backtrack(vector<int>& matchsticks, vector<bool>& used, int startIndex, int currSum, int target, int sidesLeft) {
+        if (sidesLeft == 0) return true;
+
+        if (currSum == target) {
+            // One side complete, start next side from index 0
+            return backtrack(matchsticks, used, 0, 0, target, sidesLeft - 1);
         }
 
-        for (int i = 0; i < 4; i++) {
-            if (sides[i] + matchsticks[index] <= target) {
-                sides[i] += matchsticks[index];
-                if (backtrack(matchsticks, sides, index + 1, target)) return true;
-                sides[i] -= matchsticks[index];
-            }
-            if (sides[i] == 0) break;
+        for (int i = startIndex; i < matchsticks.size(); ++i) {
+            if (used[i] || currSum + matchsticks[i] > target)
+                continue;
+
+            used[i] = true;
+            if (backtrack(matchsticks, used, i + 1, currSum + matchsticks[i], target, sidesLeft))
+                return true;
+            used[i] = false;
+            if (currSum == 0) break;
         }
 
         return false;
     }
 
     bool makesquare(vector<int>& matchsticks) {
-        int sum = accumulate(matchsticks.begin(), matchsticks.end(), 0);
-        if (sum % 4 != 0 || matchsticks.size() < 4) return false;
+        int total = accumulate(matchsticks.begin(), matchsticks.end(), 0);
+        if (total % 4 != 0 || matchsticks.size() < 4) return false;
 
-        int target = sum / 4;
-        vector<int> sides(4, 0);
+        int target = total / 4;
+        vector<bool> used(matchsticks.size(), false);
+
         sort(matchsticks.rbegin(), matchsticks.rend());
-        return backtrack(matchsticks, sides, 0, target);
+        return backtrack(matchsticks, used, 0, 0, target, 4);
     }
 };
