@@ -1,29 +1,31 @@
 class Solution {
 public:
-    vector<vector<int>> ans;
+    vector<vector<int>> result;
+    int n;
+    
+    void solve(int idx, vector<int>& nums) {
 
-    void backtrack(vector<int>& nums, vector<int>& curr, vector<bool>& used) {
-        if (curr.size() == nums.size()) {
-            ans.push_back(curr);
+        if(idx == n) {
+            result.push_back(nums);
             return;
         }
-
-        for (int i = 0; i < nums.size(); ++i) {
-            if (used[i]) continue;
-
-            used[i] = true;
-            curr.push_back(nums[i]);
-            backtrack(nums, curr, used);
-            curr.pop_back();
-            used[i] = false;
+        
+        for(int i = idx; i < n; i++) {
+            swap(nums[i], nums[idx]);
+            
+            solve(idx+1, nums);
+            
+            swap(nums[i], nums[idx]);
         }
+        
+        
     }
-
+    
     vector<vector<int>> permute(vector<int>& nums) {
-        int n = nums.size();
-        vector<int> curr;
-        vector<bool> used(n, false);
-        backtrack(nums, curr, used);
-        return ans;
+        n = nums.size();
+        
+        solve(0, nums);
+        
+        return result;
     }
 };
