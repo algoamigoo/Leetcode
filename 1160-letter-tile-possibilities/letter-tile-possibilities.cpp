@@ -1,5 +1,5 @@
 class Solution {
-public: set<string> res; // Use set to avoid duplicates
+public: set<string> res;
     
     void backtrack(string& subset, string& tiles, vector<bool>& used) {
         if (!subset.empty()) {
@@ -7,10 +7,8 @@ public: set<string> res; // Use set to avoid duplicates
         }
         
         for (int i = 0; i < tiles.length(); i++) {
-            if (used[i]) continue;
             
-            // Skip duplicates: if same character and previous same character not used
-            if (i > 0 && tiles[i] == tiles[i-1] && !used[i-1]) continue;
+            if (used[i] || i > 0 && tiles[i] == tiles[i-1] && !used[i-1]) continue;
             
             subset.push_back(tiles[i]);
             used[i] = true;
