@@ -1,31 +1,26 @@
-//RJ
-#include <bits/stdc++.h>
-using namespace std;
-
 class Solution {
 public:
-    void backtrack(vector<string> &s, string &curr, int n) {
+    vector<string> ans;
+
+    void backtrack(int n, int k, string curr) {
         if (curr.size() == n) {
-            s.push_back(curr);
+            ans.push_back(curr);
             return;
         }
-        
-        for (char c : {'a', 'b', 'c'}) {
-            if (curr.empty() || curr.back() != c) {
-                curr.push_back(c);
-                backtrack(s, curr, n);
-                curr.pop_back();
+
+        if (ans.size() >= k) return;
+
+        for (char ch : {'a', 'b', 'c'}) {
+            if (curr.empty() || curr.back() != ch) {
+                backtrack(n, k, curr + ch);
             }
         }
     }
 
     string getHappyString(int n, int k) {
-        vector<string> s;
-        string curr;
-        backtrack(s, curr, n);
-        if(k<=s.size())
-        return s[k-1];
-        
+        backtrack(n, k, "");
+        if (k <= ans.size())
+            return ans[k - 1];
         return "";
     }
 };
