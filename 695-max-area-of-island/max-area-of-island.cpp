@@ -1,38 +1,33 @@
 class Solution {
 public:
-    int n, m;
+    int r,c;
+    int dfs(int i,int j,vector<vector<bool>>&vis,vector<vector<int>> &grid){
+        if(i<0 || i>=r || j<0 || j>=c || vis[i][j] || grid[i][j]==0)
+        return 0;
 
-    int func(int i, int j, vector<vector<bool>> &vis, vector<vector<int>>& grid) {
-        vis[i][j] = true;
-        int area = 1;
-        int dx[4] = {0, 0, 1, -1};
-        int dy[4] = {1, -1, 0, 0};
+        vis[i][j]=true;
 
-        for (int k = 0; k < 4; k++) {
-            int nx = i + dx[k];
-            int ny = j + dy[k];
-            if (nx >= 0 && nx < n && ny >= 0 && ny < m &&
-                !vis[nx][ny] && grid[nx][ny] == 1) {
-                area += func(nx, ny, vis, grid);
-            }
-        }
-        return area;
+        return {1+dfs(i+1,j,vis,grid)
+                  +dfs(i,j+1,vis,grid)
+                  +dfs(i,j-1,vis,grid)
+                  +dfs(i-1,j,vis,grid)};
     }
-
     int maxAreaOfIsland(vector<vector<int>>& grid) {
-        n = grid.size();
-        m = grid[0].size();
-        vector<vector<bool>> vis(n, vector<bool>(m, false));
-        int mx = 0;
+        int rows = grid.size();
+        int cols = grid[0].size();
+        r=rows;
+        c=cols;
+        vector<vector<bool>> vis(rows,vector<bool>(cols,false));
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (!vis[i][j] && grid[i][j] == 1) {
-                    mx = max(mx, func(i, j, vis, grid));
+        int max_area=0;
+        for(int r=0;r<rows;r++){
+            for(int c=0;c<cols;c++){
+                if(!vis[r][c] && grid[r][c]==1){
+                    int area=dfs(r,c,vis,grid);
+                    max_area=max(area,max_area);
                 }
             }
         }
-
-        return mx;
+        return max_area;
     }
 };
