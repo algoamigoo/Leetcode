@@ -1,35 +1,21 @@
 class Solution {
 public:
-    unordered_map<char, int> m;
-
-    static bool cmp(const string& s1, const string& s2, unordered_map<char, int>& m) {
-        int l1 = s1.length();
-        int l2 = s2.length();
-        int i = 0, j = 0;
-        while (i < l1 && j < l2) {
-            if (m[s1[i]] > m[s2[j]]) return false;
-            if (m[s1[i]] < m[s2[j]]) return true;
-            i++;
-            j++;
-        }
-        return l1 <= l2;
-    }
-
     bool isAlienSorted(vector<string>& words, string order) {
-        for (int i = 0; i < order.length(); i++) {
-            m[order[i]] = i + 1;
+        // Step 1: build mapping
+        vector<char> mp(26);
+        for (int i = 0; i < 26; i++) {
+            mp[order[i] - 'a'] = 'a' + i; // map alien char to normal alphabet
         }
 
-        vector<string> v = words;
-
-        sort(words.begin(), words.end(), [&](const string& a, const string& b) {
-            return cmp(a, b, m);
-        });
-
-        for (int i = 0; i < v.size(); i++) {
-            if (words[i] != v[i]) 
-            return false;
+        // Step 2: translate each word
+        vector<string> translated;
+        for (auto &w : words) {
+            string t;
+            for (char c : w) t.push_back(mp[c - 'a']);
+            translated.push_back(t);
         }
-        return true;
+
+        // Step 3: check sorted
+        return is_sorted(translated.begin(), translated.end());
     }
 };
