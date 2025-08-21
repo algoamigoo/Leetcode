@@ -5,12 +5,14 @@ public:
     int find(int x) {
         if (x == parent[x])
             return x;
-        return parent[x] = find(parent[x]);
+        return parent[x] = find(parent[x]); // path compression
     }
 
     void Union(int x, int y) {
         int x_parent = find(x);
         int y_parent = find(y);
+
+        if (x_parent == y_parent) return;
 
         if (rank[x_parent] > rank[y_parent]) {
             parent[y_parent] = x_parent;
@@ -29,6 +31,7 @@ public:
         for (int i = 0; i < n; i++)
             parent[i] = i;
 
+        // map email -> account index
         unordered_map<string, int> emailToAcc;
         for (int i = 0; i < n; i++) {
             for (int j = 1; j < accounts[i].size(); j++) {
@@ -41,21 +44,27 @@ public:
             }
         }
 
+        // group emails by root
         unordered_map<int, vector<string>> merged;
-        for (auto& p : emailToAcc) {
+        for (auto &p : emailToAcc) {
             string email = p.first;
             int root = find(p.second);
             merged[root].push_back(email);
         }
 
+        // build final answer
         vector<vector<string>> ans;
         for (auto &it : merged) {
             int root = it.first;
-            vector<string> emails = it.second;
-            sort(emails.begin(), emails.end()); // optional
+            vector<string> &emails = it.second;
+
+            sort(emails.begin(), emails.end());
             vector<string> mergedAcc;
-            mergedAcc.push_back(accounts[root][0]); // name
-            mergedAcc.insert(mergedAcc.end(), emails.begin(), emails.end());
+            mergedAcc.push_back(accounts[root][0]);
+            for (string &email : emails) {
+                mergedAcc.push_back(email);
+            }
+
             ans.push_back(mergedAcc);
         }
 
