@@ -20,6 +20,7 @@ public:
         sort(sorted.begin(), sorted.end());
 
         vector<int> ans;
+
         for (int q: queries) {
             long long total=0;
 
@@ -34,7 +35,6 @@ public:
             for (auto &p: cnt) {
                 int u=p.first.first, v=p.first.second, c=p.second;
                 if (deg[u]+deg[v] > q && deg[u]+deg[v]-c <= q) total--;
-                if (deg[u]+deg[v] <= q && deg[u]+deg[v]-c > q) total++;
             }
 
             ans.push_back((int)total);
