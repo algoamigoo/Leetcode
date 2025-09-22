@@ -7,8 +7,8 @@ public:
         }
     };
 
-    map<string, set<pair<int,string>, cmp>> cuisineBest;
-    map<string, pair<string,int>> foodtoC;
+    unordered_map<string, set<pair<int,string>, cmp>> cuisineBest;
+    unordered_map<string, pair<string,int>> foodtoC;
 
     FoodRatings(vector<string>& foods, vector<string>& cuisines, vector<int>& ratings) {
         int n = foods.size();
