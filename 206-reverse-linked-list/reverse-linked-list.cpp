@@ -7,14 +7,16 @@
  *     ListNode(int x) : val(x), next(nullptr) {}
  *     ListNode(int x, ListNode *next) : val(x), next(next) {}
  * };
- */class Solution {
+ */
+class Solution {
 public:
-    ListNode* reverseList(ListNode* head) {
-        if(head==NULL || head->next==NULL)
-        return head;
-        ListNode* last = reverseList(head->next);
-        head->next->next=head;
-        head->next=NULL;
-        return last;
-    }
+ListNode* reverseList(ListNode* head) {
+    if (!head || !head->next) return head;
+    
+    ListNode* newHead = reverseList(head->next);
+    head->next->next = head;  // Reverse the link
+    head->next = nullptr;     // Remove old link
+    
+    return newHead;
+}
 };
